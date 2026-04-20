@@ -75,16 +75,56 @@ nodes = [
 "Functional Impairment","Quality of Life"
 ]
 
+# -----------------------------
+# Reference Node Positions (from base causal network)
+# -----------------------------
+
+node_positions = {
+
+"ADHD": (0, 0),
+"Diagnosis Status": (0, -220),
+
+"Genetic Risk": (0, 180),
+
+"Symptom Severity": (-120, -80),
+"Symptom Type": (-200, 0),
+"Functional Impairment": (0, -60),
+"Comorbid Conditions": (120, 40),
+
+"Age": (80, -150),
+"Gender": (-80, -150),
+
+"Socioeconomic Status": (220, -20),
+"Cost of Evaluation": (180, -100),
+"Access to Mental Health Care": (160, 40),
+
+"Stigma": (200, 80),
+"Cultural Norms": (320, 80),
+
+"Workplace Accommodations": (100, 120),
+
+"Quality of Life": (-60, -180)
+}
+
+# -----------------------------
+# Add Nodes Using Reference Layout
+# -----------------------------
+
 for node in nodes:
 
-    ntype = node_types.get(node,"factor")
+    ntype = node_types.get(node, "factor")
+
+    x, y = node_positions.get(node, (0, 0))
 
     net.add_node(
         node,
         label=node,
         color=colors[ntype],
         size=40 if ntype in ["root","outcome"] else 25,
-        title=f"Node type: {ntype}"
+        title=f"Node type: {ntype}",
+        x=x,
+        y=y,
+        physics=False
     )
 
 # -----------------------------
@@ -159,7 +199,7 @@ net.set_options("""
     "hover": true
   },
   "physics": {
-    "enabled": true
+    "enabled": false
   }
 }
 """)

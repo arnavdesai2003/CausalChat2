@@ -20,6 +20,26 @@ net.barnes_hut(
     spring_length=240,
     spring_strength=0.02
 )
+net.add_node(
+    "ADHD",
+    label="ADHD (Underlying Disorder)",
+    color="#1f77b4",
+    size=45,
+    x=0,
+    y=0,
+    physics=False
+)
+
+net.add_node(
+    "Diagnosis Status",
+    label="Diagnosis Status",
+    color="#ff7f0e",
+    size=45,
+    x=0,
+    y=-250,
+    physics=False
+)
+
 
 # -----------------------------
 # Node Categories
@@ -50,6 +70,65 @@ colors = {
 }
 
 # -----------------------------
+# Fixed Node Positions (REFERENCE LAYOUT)
+# -----------------------------
+
+node_positions = {
+
+# ROOT
+"ADHD": (0,0),
+
+# BIOLOGICAL
+"Genetic Risk": (-300,-150),
+"Age": (-150,-150),
+"Gender": (150,-150),
+
+# SYMPTOMS
+"Symptom Severity": (-250,120),
+"Symptom Type": (-350,120),
+"Comorbid Conditions": (250,120),
+
+# FUNCTIONAL
+"Functional Impairment": (0,200),
+"Misdiagnosis Rate": (350,120),
+
+# FAMILY
+"Parental Awareness": (-450,250),
+"Parenting Style": (-550,220),
+"Family Stress": (-300,250),
+"Household Stability": (-450,320),
+
+# SCHOOL
+"Teacher Referral Rate": (-350,360),
+"Classroom Size": (-450,450),
+"School Resources": (-200,420),
+"Academic Demands": (200,220),
+
+# WORK
+"Workplace Accommodations": (320,260),
+
+# HEALTHCARE
+"Access to Mental Health Care": (350,350),
+"Provider Availability": (520,350),
+"Diagnostic Criteria Variability": (150,300),
+"Waiting Time for Assessment": (300,420),
+"Cost of Evaluation": (200,500),
+
+# SOCIAL
+"Stigma": (-100,350),
+"Gender Bias": (100,420),
+"Cultural Norms": (-150,450),
+"Socioeconomic Status": (450,450),
+
+# DIAGNOSIS
+"Diagnosis Status": (0,520),
+"Age at Diagnosis": (-50,600),
+
+# OUTCOME
+"Quality of Life": (0,700)
+}
+
+# -----------------------------
 # All Nodes
 # -----------------------------
 
@@ -74,12 +153,17 @@ for node in nodes:
 
     ntype = node_types.get(node,"factor")
 
+    x,y = node_positions.get(node,(0,0))
+
     net.add_node(
         node,
         label=node,
         color=colors[ntype],
-        size=35 if ntype in ["root","outcome"] else 22,
-        title=f"Node Type: {ntype}"
+        size=40 if ntype in ["root","outcome"] else 25,
+        title=f"Node type: {ntype}",
+        x=x,
+        y=y,
+        physics=True
     )
 
 # -----------------------------
@@ -124,38 +208,44 @@ edges = [
 ("Diagnosis Status","Quality of Life","+",0.75)
 
 ]
-for u, v, sign, power in edges:
 
-    color = "green" if sign == "+" else "red"
+for u,v,sign,power in edges:
+
+    color = "green" if sign=="+" else "red"
 
     net.add_edge(
         u,
         v,
         color=color,
-        width=power * 8,          # thickness reflects power
+        width=power*8,
         value=power,
         arrows="to",
         title=f"""
-        Causal Relationship
+Causal Relationship
 
-        Direction: {u} → {v}
-        Effect: {"Positive" if sign=="+" else "Negative"}
-        Causal Power: {power:.2f}
-        """
+Direction: {u} → {v}
+Effect: {"Positive" if sign=="+" else "Negative"}
+Causal Power: {power:.2f}
+"""
     )
+
 # -----------------------------
 # Enable Node Interaction
 # -----------------------------
 
 net.set_options("""
 {
+  "layout": {
+    "improvedLayout": true
+  },
+  "physics": {
+    "enabled": false
+  },
   "interaction": {
     "dragNodes": true,
     "dragView": true,
-    "zoomView": true
-  },
-  "physics": {
-    "enabled": true
+    "zoomView": true,
+    "hover": true
   }
 }
 """)
@@ -165,8 +255,8 @@ net.set_options("""
 # -----------------------------
 
 net.add_node(
-"Legend",
-label="""
+    "Legend",
+    label="""
 Legend
 
 Green Edge (+) : Positive Effect
@@ -178,11 +268,12 @@ Green Node     : Mediator
 Purple Node    : Confounder
 Yellow Node    : Latent Factor
 """,
-shape="box",
-physics=False,
-color="#f5f5f5"
+    shape="box",
+    physics=False,
+    color="#f5f5f5",
+    x=-900,
+    y=-600
 )
-
 # -----------------------------
 # Save Graph
 # -----------------------------
